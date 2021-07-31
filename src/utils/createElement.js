@@ -31,6 +31,11 @@ function createElement(type, props = {}, events = {}) {
 
 function append(parent, ...children) {
   children.forEach(el => {
+    if (!el) return;
+    if (el instanceof Array) {
+      append(parent, ...el)
+      return
+    }
     parent.appendChild(el)
   })
 

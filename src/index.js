@@ -6,19 +6,27 @@ const root = Element.byId("root")
 
 const COMMENT_STORE = "comments"
 
-function commentForm() {
+function commentForm(onSubmit, props = {}) {
   const addComment = (e) => {
     const comment = {
       id: Symbol(),
-      text: val(textInput)
+      text: val(textInput),
+      replies: []
     }
-    update(COMMENT_STORE, prev => [...prev, comment])
+    onSubmit(comment)
     textInput.value = ""
     e.preventDefault();
   }
-  const textInput = createElement("textarea", {className: "comment-input", placeholder: "Add your comment here...", required: true})
+  const textInput = createElement("textarea", {
+    className: "comment-input",
+    placeholder: "Add your comment here...",
+    required: true
+  })
   const submit = createElement("button", {children: "Submit", type: "submit", className: "button"})
-  const form = createElement("form", {className: "comment-form"}, {[Events.SUBMIT]: addComment})
+  const form = createElement("form", {
+    ...props,
+    className: "comment-form " + props.className
+  }, {[Events.SUBMIT]: addComment})
 
   return append(form, textInput, submit)
 }
@@ -29,13 +37,37 @@ function iconButton(icon, props, events) {
   return append(btn, i)
 }
 
-function commentBox({id, text}, handleDelete) {
+function add(allComments, comment, trail) {
+  let newState = [...allComments]
+  let itr = newState
+  trail.forEach((_id, index) => {
+    newState = newState.find(({id}) => id === _id)
+    if (trail.length - 1 !== index) {
+      newState = newState.replies
+    }
+  })
+  newState?.replies.push(comment)
+  return itr
+}
+
+function commentBox({id, text, replies}, handleDelete, trail) {
+  const openReplyInput = () => {
+    const replyPanel = commentForm((comment) => {
+      update(COMMENT_STORE, comments => add(comments, comment, [...trail, id]))
+    }, {className: "reply-box"})
+    append(commentContainer, replyPanel)
+  }
+
   const commentText = createElement("p", {className: "comment-text", innerHTML: text})
-  const del = iconButton("trash", {className: "delete-button"}, {[Events.CLICK]: () => handleDelete(id)})
+  const del = iconButton("trash", {className: "delete-button comment-action"}, {[Events.CLICK]: () => handleDelete(id)})
+  const replyButton = iconButton("reply", {className: "comment-action reply-button"}, {[Events.CLICK]: () => openReplyInput()})
 
   const commentContainer = createElement("div", {className: "comment"})
 
-  return append(commentContainer, commentText, del)
+  const replyList = replies?.map(comment => commentBox(comment, handleDelete, [id]));
+  const replyComponent = createElement("div", {id: "replies"})
+
+  return append(commentContainer, commentText, replyButton, del, append(replyComponent, replyList))
 }
 
 function commentList() {
@@ -43,7 +75,7 @@ function commentList() {
     update(COMMENT_STORE, comments => comments.filter(({id}) => id !== commentId))
   }
 
-  const list = comments => comments.map(comment => commentBox(comment, handleDelete));
+  const list = comments => comments.map(comment => commentBox(comment, handleDelete, []));
 
   const wrapper = createElement("div", {id: "comments", className: "comments"})
 
@@ -64,4 +96,7 @@ function commentList() {
 }
 
 createStore(COMMENT_STORE, [])
-append(root, commentForm(), commentList())
+
+const onComment = comment => update(COMMENT_STORE, prev => [...prev, comment])
+
+append(root, commentForm(onComment), commentList())

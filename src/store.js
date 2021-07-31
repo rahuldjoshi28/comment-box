@@ -7,7 +7,7 @@ function createStore(name, initialState) {
 function update(name, updator) {
   const selectedStore = store[name];
   selectedStore.state = updator(selectedStore.state)
-  selectedStore.listeners.forEach(listener => listener(selectedStore.state))
+  selectedStore.listeners.forEach(listener => setTimeout(() => listener(selectedStore.state)))
 }
 
 function getState(name) {

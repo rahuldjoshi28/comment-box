@@ -35,10 +35,14 @@
 .delete-button {
     color: red;
     font-weight: bold;
-    position: absolute;
-    right: 5px;
-    top: 5px;
 }
+
+.comment-action {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+}
+
 
 .comments {
     margin-top: 20px;
@@ -46,4 +50,12 @@
 
 .comments .comment {
     margin-top: 20px;
+}
+
+.reply-button {
+    right: 36px;
+}
+
+.reply-box {
+    margin-top: 15px;
 }
