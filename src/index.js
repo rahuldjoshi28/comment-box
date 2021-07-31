@@ -50,7 +50,26 @@ function add(allComments, comment, trail) {
   return itr
 }
 
-function commentBox({id, text, replies}, handleDelete, trail) {
+function del(allComments, comment, trail) {
+  if (trail.length === 0) {
+    return allComments.filter(({id}) => id !== comment)
+  }
+
+  let newState = [...allComments]
+  let itr = newState
+
+  for (let i = 0; i < trail.length; i++) {
+    newState = newState.find(({id}) => id === trail[i])
+    if (i !== trail.length - 1) {
+      newState = newState.replies
+    }
+  }
+
+  newState.replies = newState.replies.filter(cmt => cmt.id !== comment)
+  return itr
+}
+
+function commentBox({id, text, replies}, trail) {
   const openReplyInput = () => {
     const replyPanel = commentForm((comment) => {
       update(COMMENT_STORE, comments => add(comments, comment, [...trail, id]))
@@ -58,24 +77,24 @@ function commentBox({id, text, replies}, handleDelete, trail) {
     append(commentContainer, replyPanel)
   }
 
+  const handleDelete = (comment) => {
+    update(COMMENT_STORE, comments => del(comments, comment, [...trail]))
+  }
+
   const commentText = createElement("p", {className: "comment-text", innerHTML: text})
-  const del = iconButton("trash", {className: "delete-button comment-action"}, {[Events.CLICK]: () => handleDelete(id)})
+  const deleteButton = iconButton("trash", {className: "delete-button comment-action"}, {[Events.CLICK]: () => handleDelete(id)})
   const replyButton = iconButton("reply", {className: "comment-action reply-button"}, {[Events.CLICK]: () => openReplyInput()})
 
   const commentContainer = createElement("div", {className: "comment"})
 
-  const replyList = replies?.map(comment => commentBox(comment, handleDelete, [id]));
+  const replyList = replies?.map(comment => commentBox(comment, [...trail, id]));
   const replyComponent = createElement("div", {id: "replies"})
 
-  return append(commentContainer, commentText, replyButton, del, append(replyComponent, replyList))
+  return append(commentContainer, commentText, replyButton, deleteButton, append(replyComponent, replyList))
 }
 
 function commentList() {
-  function handleDelete(commentId) {
-    update(COMMENT_STORE, comments => comments.filter(({id}) => id !== commentId))
-  }
-
-  const list = comments => comments.map(comment => commentBox(comment, handleDelete, []));
+  const list = comments => comments.map(comment => commentBox(comment, []));
 
   const wrapper = createElement("div", {id: "comments", className: "comments"})
 
