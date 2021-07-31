@@ -1,0 +1,28 @@
+#root {
+    width: 600px;
+    margin: 40px auto;
+}
+
+.comment-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.button {
+    width: 100px;
+}
+
+.comment-form .button {
+    align-self: flex-end;
+    margin-top: 10px;
+}
+
+.comment-form .comment-input {
+    height: 80px;
+    resize: none;
+}
+
+.comment {
+    padding: 10px;
+    background-color: lightgray;
+}
