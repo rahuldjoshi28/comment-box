@@ -88,9 +88,11 @@ function commentBox({id, text, replies}, trail) {
   const commentContainer = createElement("div", {className: "comment"})
 
   const replyList = replies?.map(comment => commentBox(comment, [...trail, id]));
-  const replyComponent = createElement("div", {id: "replies"})
+  const replyComponent = createElement("div", {id: "replies", className: "replies"})
 
-  return append(commentContainer, commentText, replyButton, deleteButton, append(replyComponent, replyList))
+  const commentWrapper = createElement("div", {className: "main"})
+
+  return append(commentContainer, append(commentWrapper,commentText, replyButton, deleteButton), append(replyComponent, replyList))
 }
 
 function commentList() {
