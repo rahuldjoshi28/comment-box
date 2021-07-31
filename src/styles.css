@@ -25,4 +25,25 @@
 .comment {
     padding: 10px;
     background-color: lightgray;
+    position: relative;
+}
+
+.comment p {
+    margin: 0;
+}
+
+.delete-button {
+    color: red;
+    font-weight: bold;
+    position: absolute;
+    right: 5px;
+    top: 5px;
+}
+
+.comments {
+    margin-top: 20px;
+}
+
+.comments .comment {
+    margin-top: 20px;
 }
